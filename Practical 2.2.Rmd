@@ -1,0 +1,106 @@
+---
+title: "Practical 2.2"
+author: "CHEN"
+date: "2024-01-23"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Drug trial dataset - revisited
+
+## Formulate H0 and H1
+What are the Null and Alternative Hypotheses? Write them down.
+H0: There is no difference between different drug trial groups in pain score.
+HA: There is a difference between different drug trial groups in pain score.
+
+## Load and inspect the dataset
+```{r imoprt the data}
+drug <- read.csv("drug_trial.csv")
+library(ggplot2)
+# Plot the data in a boxplot
+g1 <- ggplot(data = drug, aes(x = treatment, y = pain))
+g1_1 <- g1 +geom_boxplot(color = c("lightgreen","lightblue","orange"))
+g1_1
+```
+
+## Check whether the assumptions for an ANOVA are met
+List the three assumptions that need to be met for an ANOVA:
+1.Independent random sampling
+2.Normality of residuals
+3.Equality of variances
+Do the assessment about whether those assumptions are met.
+
+### Independent random sampling
+Believe that this is true given the description of the experiment itself.
+
+### Normality of residuals 
+Make aov model:
+```{r making aov model}
+model <- aov(pain ~ treatment, 
+data = drug)
+```
+
+Method 1.
+```{r method 1 for normality assessment}
+hist(resid(model), main = "residuals")
+```
+Method 2.
+The plot is the second one shown and is called Normal Q-Q. Dots should 
+be aligned along the diagonal.
+```{r method 2 for normality assessment}
+plot(model, 2)
+```
+Method 3.Use a formal test for normality, e.g. the Shapiro-Wilk test 
+H0: 
+HA:
+```{r method 3 for normality assessment}
+shapiro.test(resid(model))
+```
+
+### Equality of variances
+Use “Residuals vs Fitted” plot. Looking for similar heights of “columns”.
+```{r assessment of equality}
+plot(model, 1)
+```
+
+## Run an ANOVA
+```{r ANOVA for drug dataset}
+summary(model)
+```
+gg <- ggplot(data=mouse, mapping=aes(x=genotype, y=weight_gain))
+gg1 <- gg+geom_boxplot()
+gg1
+
+## Run a post-hoc test
+It looks like we have a significant result, so now it is time for a post-hoc test.
+```{r post-hoc test for drug dataset}
+TukeyHSD(model)
+```
+The “p adj” values are the adjusted p values.
+This means that they have already been corrected for multiple testing, so you can go ahead and compare those values directly to the alpha level of your choice.
+What do you conclude?
+
+
+# Weight loss in mice
+You are interested in a gene that is said to control appetite control. Specifically, mice with one or two copies of the “A” allele seem to be better than mice with the “B” allele at controlling their food intake, even if unlimited food is available.
+Is this appetite control allele also related to weight loss?
+For this experiment, you tested mice of the homozygous “AA” and “BB” genotypes, as well as heterozygous “AB” mice. Mice were randomly separated into two groups: One group had access to only as much food as would be required to maintain their weight (“restricted”). The other group has access to unlimited food (“unrestricted”). Mice were weighed at the beginning and the end of a 1-month experiment, and their weight gain (in g) recorded (this number can be negative if the animal has lost weight).
+The data are provided in file mouse_experiment.csv.
+Import, visualise, and analyse the dataset.
+
+```{r ANOVA for mouse dataset, collapse=TRUE}
+mouse <- read.csv("mouse_experiment.csv")
+
+model2 <- aov(weight_gain ~ genotype * diet, 
+data = mouse)
+hist(resid(model2),main = "residuals")
+plot(model2)
+summary(model2)
+TukeyHSD(model2)
+```
+
+
+

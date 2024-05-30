@@ -1,0 +1,68 @@
+---
+title: "Practical 2.9 & 2.10 Solution: Supervised learning: MNIST digit classification"
+author: "CHEN"
+date: "2024-04-23"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Dimensionality reduction & Feature selection
+```{r}
+library(readr)
+library(tidyverse)
+mnist_raw <- read.csv("mnist_train.csv", header = FALSE)
+```
+
+```{r}
+pixels_gathered <- mnist_raw %>%
+  head(1000) %>%
+  rename(label = V1) %>%
+  mutate(instance = row_number()) %>%
+  gather(pixel, value, -label, -instance) %>%
+  tidyr::extract(pixel, "pixel", "(\\d+)", convert = TRUE) %>%
+  mutate(pixel = pixel - 2,
+         x = pixel %% 28,
+         y = 28 - pixel %/% 28)
+```
+
+```{r}
+features=data.frame(label=mnist_raw$V1[1:1000])
+# set labels (of 1000 examples) as the first column in features dataframe
+for (i in 1:56)
+  features=cbind(features,fi=c(1:1000)*0)
+  # create 56 features (28 for rows and 28 for column) for the 1000 examples
+for (i in 1:28) {
+  # loop over 28 rows and 28 columns 
+  for (j in 1:1000) {
+    # compute row & column means for each digit example using pixels gathered
+    features[j,i+1]= mean(pixels_gathered$value[pixels_gathered$instance==j&pixels_gathered$y==i]);
+    # first 28 features: row means (each row has fixed y)
+    features[j,i+29] = mean(pixels_gathered$value[pixels_gathered$instance==j&pixels_gathered$x==i-1]);
+    # next 28 features: column means (each row has fixed x)
+  }
+}
+```
+
+Compute means for each label and feature.
+```{r}
+fstats <- matrix(1:560, nrow=10, ncol=56)
+for (i in 1:10)
+  for ( j in 1:56) {
+  fstats[i,j] <- mean(features[features$label==i-1, j+1])
+  }
+```
+
+Plot features of each label.
+```{r}
+par(nrow=c(5,2))
+for (i in 1:10) {
+  plot(fstats[i,], ylab = "Value", xlab = "Feature index")
+  title(paste("Feature values for digit", toString(i-1)))
+}
+```
+
+
+

@@ -1,0 +1,161 @@
+---
+title: "Problem Set 2.4"
+author: "CHEN"
+date: "2024-03-05"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Question 1. Two-sample sample size estimation
+Study: Association between coffee consumption and average grade point among college seniors
+Two group: heavy drinker versus non-heavy drinker
+Test: two-sample unpaired t test
+Q: How many college seniors should be enrolled in the study to ensure that the power of the test is 80% to detect a 0.25 unit difference in mean grade point? Use a two-sided test with a 5% level of significance. 
+```{r question1}
+# Set parameters.
+point_sd <- 0.42
+point_difference <- 0.25
+college_seniors <- power.t.test(n = NULL, delta = point_difference, sd = point_sd, sig.level = 0.05, power = 0.8, type = "two.sample", alternative = "two.sided")$n
+```
+
+The number of college seniors should be enrolled in the study is:
+```{r answer1, echo = FALSE}
+college_seniors
+```
+
+# Question 2. The relationship between statistical power, sample size, significance level and effect size
+• Take a two-sample, two-sided test, with significance level of 0.05. The standard 
+deviation of our sample is 0.5. If our sample size is 20, what’s the statistical power under an effect size (mean difference of two population) of 0.4? 
+```{r question2.1}
+power1 <- power.t.test(n = 20, delta = 0.4, sd = 0.5, sig.level = 0.05, type = "two.sample", alternative = "two.sided")$power
+# Answer to question 2.1
+power1
+```
+
+• What happens to our statistical power (does it increase or decrease) if we increase our significance level to 0.1?
+```{r question2.2}
+power2 <- power.t.test(n = 20, delta = 0.4, sd = 0.5, sig.level = 0.1, type = "two.sample", alternative = "two.sided")$power
+# Answer to question 2.2
+if (power2 > power1) {
+  cat("increase","\n")
+} else {
+  cat("decrease","\n")
+}
+```
+
+• What happens to our statistical power (does it increase or decrease) if we decrease our sample size to 10? 
+```{r question2.3}
+power3 <- power.t.test(n = 10, delta = 0.4, sd = 0.5, sig.level = 0.05, type = "two.sample", alternative = "two.sided")$power
+# Answer to question 2.3
+if (power3 > power1) {
+  cat("increase","\n")
+} else {
+  cat("decrease","\n")
+}
+```
+
+• What happens to our statistical power (does it increase or decrease) if we increase our effect size to 0.8? 
+```{r question2.4}
+power4 <- power.t.test(n = 20, delta = 0.8, sd = 0.5, sig.level = 0.05, type = "two.sample", alternative = "two.sided")$power
+# Answer to question 2.4
+if (power4 > power1) {
+  cat("increase","\n")
+} else {
+  cat("decrease","\n")
+}
+```
+
+• Advanced challenges (optional). Based on the example from above, can you use simulation and plotting to figure out the relationship between statistical power vs 
+significance level, sample size, and effect size? You should draw three curves with y-axis being the statistical power and x-axis being the different significance level, or sample size, or effect size (simulate 100 data points for each plot). 
+
+```{r plot1}
+statistical_power_level <- numeric(100)
+significance_level <- seq(0.01, 1.00, 0.01)
+
+for (i in seq_along(statistical_power_level)) {
+  statistical_power_level[i] <- power.t.test(n = 20, delta = 0.4, sd = 0.5, sig.level = 0.01*i, type = "two.sample", alternative = "two.sided")$power
+}
+
+plot(significance_level, statistical_power_level, type = "l", 
+     xlab = "Significance Level", ylab = " Statistical Power", main = "power vs sig.level")
+```
+
+```{r plot2}
+statistical_power_sample <- numeric(100)
+sample_size <- seq(1, 100, 1)
+
+for (i in seq_along(statistical_power_sample)) {
+  statistical_power_sample[i] <- power.t.test(n = i, delta = 0.4, sd = 0.5, sig.level = 0.05, type = "two.sample", alternative = "two.sided")$power
+}
+
+plot(sample_size, statistical_power_sample, type = "l",
+     xlab = "Sample Size", ylab = " Statistical Power", main = "power vs n")
+```
+
+```{r}
+statistical_power_effect <- numeric(100)
+effect_size <- seq(0.1, 10, 0.1)
+
+for (i in seq_along(statistical_power_effect)) {
+  statistical_power_effect[i] <- power.t.test(n = 20, delta = 0.1*i, sd = 0.5, sig.level = 0.05, type = "two.sample", alternative = "two.sided")$power
+}
+
+plot(effect_size, statistical_power_effect, type = "l",
+     xlab = "Effect Size", ylab = " Statistical Power", main = "power vs delta")
+```
+
+# Question 3. The relationship between sample size and p-value
+First, for sample A, generate 5 random numbers from a normal distribution with  mean of 10 and sd of 5.
+```{r}
+
+```
+
+Then, for sample B, generate 5 random number from normal distribution with mean of 11 and sd of 5.
+```{r}
+
+```
+
+Now we want to compare whether there is ant significance difference between the mean of sample A and B, what should we do? Write out the R code.
+```{r}
+
+```
+
+Is there any significant difference for the mean of sample A and B? Write out the R code.
+```{r}
+
+```
+
+Is there any significant difference for the mean of sample A and B?
+```{r}
+
+```
+
+What if we now increase the sample size to 500 (instead of 5) for sample A and B?
+```{r}
+
+```
+
+Is there any significant difference for the mean of sample A and B? Write out R code.
+```{r}
+
+```
+
+Advanced challenges (optional). If you can figure it out yourself, you are an absolute ‘R master’! Just like we did previously, can you use simulation and ploYng to visualize the relationship between sample size and p-value? Plot out the curve with p-value on the y-axis and different sample number on the x-axis (with at least 100 datapoints).
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
